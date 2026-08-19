@@ -55,8 +55,7 @@ export default function AuthorModal({
       newBirthYear === (authorToEdit.birthYear || "") &&
       newBio === (authorToEdit.bio || "")
     ) {
-      alert("Không có gì thay đổi cả");
-      onClose();
+      setErrors({ general: "Không có gì thay đổi cả. Vui lòng chỉnh sửa hoặc bấm Hủy." });
       return;
     }
 
@@ -88,6 +87,13 @@ export default function AuthorModal({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {errors.general && (
+            <div className="bg-amber-50 text-amber-800 p-3 rounded-lg text-sm border border-amber-200 flex items-center gap-2">
+              <svg className="w-4 h-4 min-w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+              {errors.general}
+            </div>
+          )}
+
           {/* Tên tác giả */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
