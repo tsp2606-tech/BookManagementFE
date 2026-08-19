@@ -55,6 +55,7 @@ export default function AuthorModal({
       newBirthYear === (authorToEdit.birthYear || "") &&
       newBio === (authorToEdit.bio || "")
     ) {
+      alert("Không có gì thay đổi cả");
       onClose();
       return;
     }

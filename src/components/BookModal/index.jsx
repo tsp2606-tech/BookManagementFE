@@ -69,6 +69,7 @@ export default function BookModal({
       newPrice === (bookToEdit.price !== undefined ? bookToEdit.price : "") &&
       newDesc === (bookToEdit.description || "")
     ) {
+      alert("Không có gì thay đổi cả");
       onClose();
       return;
     }
