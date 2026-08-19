@@ -53,6 +53,26 @@ export default function BookModal({
       return;
     }
 
+    const newTitle = title.trim();
+    const newAuthorId = String(authorId).trim();
+    const newGenre = genre.trim();
+    const newYear = year ? String(year).trim() : "";
+    const newPrice = price !== "" ? Number(price) : "";
+    const newDesc = description.trim();
+
+    if (
+      bookToEdit &&
+      newTitle === (bookToEdit.title || "") &&
+      newAuthorId === String(bookToEdit.authorId || "") &&
+      newGenre === (bookToEdit.genre || "") &&
+      newYear === String(bookToEdit.year || "") &&
+      newPrice === (bookToEdit.price !== undefined ? bookToEdit.price : "") &&
+      newDesc === (bookToEdit.description || "")
+    ) {
+      onClose();
+      return;
+    }
+
     onSave({
       ...(bookToEdit ? { id: bookToEdit.id } : {}),
       title: title.trim(),

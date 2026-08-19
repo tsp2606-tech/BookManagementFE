@@ -1,103 +1,101 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import BooksPage from "./pages/BooksPage";
 import AuthorsPage from "./pages/AuthorsPage";
-
-const INITIAL_AUTHORS = [
-  {
-    id: "1",
-    name: "J.K. Rowling",
-    nationality: "UK",
-    birthYear: "1965",
-    bio: "Tác giả người Anh, nổi tiếng với series Harry Potter."
-  },
-  {
-    id: "2",
-    name: "Paulo Coelho",
-    nationality: "Brazil",
-    birthYear: "1947",
-    bio: "Tiểu thuyết gia người Brazil."
-  },
-  {
-    id: "3",
-    name: "Nguyễn Nhật Ánh",
-    nationality: "Việt Nam",
-    birthYear: "1955",
-    bio: "Nhà văn chuyên viết cho thanh thiếu niên."
-  }
-];
-
-const INITIAL_BOOKS = [
-  {
-    id: "1",
-    title: "Harry Potter và Hòn đá Phù thủy",
-    description: "Cậu bé mồ côi khám phá ra mình là một phù thủy và nhập học Trường Pháp thuật Hogwarts.",
-    authorId: "1",
-    genre: "Fantasy",
-    year: "1997",
-    price: 150000
-  },
-  {
-    id: "2",
-    title: "Nhà Giả Kim",
-    description: "Hành trình theo đuổi giấc mơ của cậu bé chăn cừu Santiago.",
-    authorId: "2",
-    genre: "Fiction",
-    year: "1988",
-    price: 79000
-  },
-  {
-    id: "3",
-    title: "Mắt Biếc",
-    description: "Câu chuyện tình dang dở của Ngạn và Hà Lan.",
-    authorId: "3",
-    genre: "Romance",
-    year: "1990",
-    price: 110000
-  }
-];
+import { authorApi, bookApi } from "./services/api";
 
 export default function App() {
   const [activeView, setActiveView] = useState("books");
-  const [authors, setAuthors] = useState(INITIAL_AUTHORS);
-  const [books, setBooks] = useState(INITIAL_BOOKS);
+  const [authors, setAuthors] = useState([]);
+  const [books, setBooks] = useState([]);
 
-  // Book Handlers
-  const handleSaveBook = (bookData) => {
-    if (bookData.id) {
-      setBooks((prev) =>
-        prev.map((b) => (b.id === bookData.id ? { ...b, ...bookData } : b))
-      );
-    } else {
-      const newBook = {
-        ...bookData,
-        id: Date.now().toString()
-      };
-      setBooks((prev) => [...prev, newBook]);
+  const loadData = async () => {
+    try {
+      const [fetchedAuthors, fetchedBooks] = await Promise.all([
+        authorApi.getAll(),
+        bookApi.getAll()
+      ]);
+      setAuthors(fetchedAuthors);
+      setBooks(fetchedBooks);
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu:", error);
     }
   };
 
-  const handleDeleteBook = (id) => {
-    setBooks((prev) => prev.filter((b) => b.id !== id));
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Book Handlers
+  const handleSaveBook = async (bookData) => {
+    try {
+      if (bookData.id) {
+        const updated = await bookApi.update(bookData.id, bookData);
+        setBooks((prev) =>
+          prev.map((b) => (b.id === updated.id ? updated : b))
+        );
+      } else {
+        const created = await bookApi.create(bookData);
+        setBooks((prev) => [...prev, created]);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        alert("Sách không tồn tại (có thể đã bị xoá bởi người khác)");
+        loadData();
+      } else {
+        alert("Có lỗi xảy ra khi lưu sách.");
+      }
+    }
+  };
+
+  const handleDeleteBook = async (id) => {
+    try {
+      await bookApi.delete(id);
+      setBooks((prev) => prev.filter((b) => b.id !== id));
+    } catch (error) {
+      if (error.response?.status === 404) {
+        alert("Sách không tồn tại (có thể đã bị xoá bởi người khác)");
+        loadData();
+      } else {
+        alert("Có lỗi xảy ra khi xoá sách.");
+      }
+    }
   };
 
   // Author Handlers
-  const handleSaveAuthor = (authorData) => {
-    if (authorData.id) {
-      setAuthors((prev) =>
-        prev.map((a) => (a.id === authorData.id ? { ...a, ...authorData } : a))
-      );
-    } else {
-      const newAuthor = {
-        ...authorData,
-        id: Date.now().toString()
-      };
-      setAuthors((prev) => [...prev, newAuthor]);
+  const handleSaveAuthor = async (authorData) => {
+    try {
+      if (authorData.id) {
+        const updated = await authorApi.update(authorData.id, authorData);
+        setAuthors((prev) =>
+          prev.map((a) => (a.id === updated.id ? updated : a))
+        );
+      } else {
+        const created = await authorApi.create(authorData);
+        setAuthors((prev) => [...prev, created]);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        alert("Tác giả không tồn tại (có thể đã bị xoá bởi người khác)");
+        loadData();
+      } else {
+        alert("Có lỗi xảy ra khi lưu tác giả.");
+      }
     }
   };
 
-  const handleDeleteAuthor = (id) => {
-    setAuthors((prev) => prev.filter((a) => a.id !== id));
+  const handleDeleteAuthor = async (id) => {
+    try {
+      await authorApi.delete(id);
+      setAuthors((prev) => prev.filter((a) => a.id !== id));
+    } catch (error) {
+      if (error.response?.status === 404) {
+        alert("Tác giả không tồn tại (có thể đã bị xoá bởi người khác)");
+        loadData();
+      } else {
+        alert(error.response?.data?.error || "Có lỗi xảy ra khi xoá tác giả.");
+      }
+    }
   };
 
   return (

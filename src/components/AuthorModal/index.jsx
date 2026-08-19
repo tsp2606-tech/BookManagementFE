@@ -43,6 +43,22 @@ export default function AuthorModal({
       return;
     }
 
+    const newName = name.trim();
+    const newNationality = nationality.trim();
+    const newBirthYear = birthYear ? String(birthYear).trim() : "";
+    const newBio = bio.trim();
+
+    if (
+      authorToEdit &&
+      newName === (authorToEdit.name || "") &&
+      newNationality === (authorToEdit.nationality || "") &&
+      newBirthYear === (authorToEdit.birthYear || "") &&
+      newBio === (authorToEdit.bio || "")
+    ) {
+      onClose();
+      return;
+    }
+
     onSave({
       ...(authorToEdit ? { id: authorToEdit.id } : {}),
       name: name.trim(),
