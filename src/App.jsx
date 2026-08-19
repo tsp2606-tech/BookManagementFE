@@ -8,6 +8,12 @@ export default function App() {
   const [activeView, setActiveView] = useState("books");
   const [authors, setAuthors] = useState([]);
   const [books, setBooks] = useState([]);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const loadData = async () => {
     try {
@@ -40,10 +46,10 @@ export default function App() {
       }
     } catch (error) {
       if (error.response?.status === 404) {
-        alert("Sách không tồn tại (có thể đã bị xoá bởi người khác)");
+        showToast("Sách không tồn tại (có thể đã bị xoá bởi người khác)");
         loadData();
       } else {
-        alert("Có lỗi xảy ra khi lưu sách.");
+        showToast("Có lỗi xảy ra khi lưu sách.");
       }
     }
   };
@@ -54,10 +60,10 @@ export default function App() {
       setBooks((prev) => prev.filter((b) => b.id !== id));
     } catch (error) {
       if (error.response?.status === 404) {
-        alert("Sách không tồn tại (có thể đã bị xoá bởi người khác)");
+        showToast("Sách không tồn tại (có thể đã bị xoá bởi người khác)");
         loadData();
       } else {
-        alert("Có lỗi xảy ra khi xoá sách.");
+        showToast("Có lỗi xảy ra khi xoá sách.");
       }
     }
   };
@@ -76,10 +82,10 @@ export default function App() {
       }
     } catch (error) {
       if (error.response?.status === 404) {
-        alert("Tác giả không tồn tại (có thể đã bị xoá bởi người khác)");
+        showToast("Tác giả không tồn tại (có thể đã bị xoá bởi người khác)");
         loadData();
       } else {
-        alert("Có lỗi xảy ra khi lưu tác giả.");
+        showToast("Có lỗi xảy ra khi lưu tác giả.");
       }
     }
   };
@@ -90,10 +96,10 @@ export default function App() {
       setAuthors((prev) => prev.filter((a) => a.id !== id));
     } catch (error) {
       if (error.response?.status === 404) {
-        alert("Tác giả không tồn tại (có thể đã bị xoá bởi người khác)");
+        showToast("Tác giả không tồn tại (có thể đã bị xoá bởi người khác)");
         loadData();
       } else {
-        alert(error.response?.data?.error || "Có lỗi xảy ra khi xoá tác giả.");
+        showToast(error.response?.data?.error || "Có lỗi xảy ra khi xoá tác giả.");
       }
     }
   };
@@ -119,6 +125,26 @@ export default function App() {
           )}
         </div>
       </main>
+      
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 bg-red-600 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-300 z-50">
+          <svg
+            className="w-5 h-5 text-red-100"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span className="font-medium text-sm">{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 }

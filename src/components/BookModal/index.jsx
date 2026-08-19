@@ -172,7 +172,8 @@ export default function BookModal({
                 Năm xuất bản
               </label>
               <input
-                type="text"
+                type="number"
+                min="0"
                 placeholder="2023"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}

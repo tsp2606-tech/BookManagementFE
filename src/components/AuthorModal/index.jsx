@@ -128,7 +128,8 @@ export default function AuthorModal({
                 Năm sinh
               </label>
               <input
-                type="text"
+                type="number"
+                min="0"
                 placeholder="1915"
                 value={birthYear}
                 onChange={(e) => setBirthYear(e.target.value)}
